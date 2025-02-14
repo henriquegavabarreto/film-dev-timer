@@ -60,6 +60,7 @@ export default function WorkflowForm(props: { resources: ResourcesData, editingW
     const [editStep, setEditStep] = useState<StepInfo | null>(null);
     const [showDialog, setShowDialog] = useState(false);
     const [saving, setSaving] = useState(false);
+    const [errorMessage, setErrorMessage] = useState<string | null>(null);
     const route = useRouter();
 
     const changeWorkflowProperty = (name: string, value: string | number | FilmFormat) => {
@@ -98,6 +99,7 @@ export default function WorkflowForm(props: { resources: ResourcesData, editingW
         }
 
         try {
+            setErrorMessage(null);
             if(!auth.currentUser) throw new Error('User is not logged in');
 
             const idToken = await auth.currentUser.getIdToken();
@@ -127,8 +129,9 @@ export default function WorkflowForm(props: { resources: ResourcesData, editingW
             setSelectedWorkflow(workflowInfo);
             route.push(`/workflow/${resData.id}`);
         } catch (error: any) {
-            console.log('Something went wrong', error.message);
+            setErrorMessage(error.message);
             setSaving(false);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
     }
 
@@ -150,6 +153,7 @@ export default function WorkflowForm(props: { resources: ResourcesData, editingW
     return (
         <form onSubmit={handleSubmit}>
             <div className="flex flex-col">
+                {errorMessage && <div className="m-5"><p className="text-red-600">{errorMessage}</p></div>}
                 <h3 className="text-lg m-5 border-b-2">Main Information</h3>
                 <div className="flex flex-col mx-5">
                     <label htmlFor="title">Name: </label>

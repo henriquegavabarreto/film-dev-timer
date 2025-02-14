@@ -43,6 +43,7 @@ export default function HistoryItemForm( props: { workflowId: string, workflowTi
         } catch (error: any) {
             setSaving(false);
             setErrorMessage(error.message || 'Failed to add history item');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
     }
 
@@ -66,7 +67,7 @@ export default function HistoryItemForm( props: { workflowId: string, workflowTi
                                 </div>
                                 <form onSubmit={handleSubmit}>
                                     <div className="flex flex-col">
-                                        {errorMessage && <div><p className="text-red-600">{errorMessage}</p></div>}
+                                        {errorMessage && <div className="m-5"><p className="text-red-600">{errorMessage}</p></div>}
                                         <div className="flex flex-col justify-start p-5">
                                             <label className="text-start font-semibold pb-2 text-lg" htmlFor="notes">Notes</label>
                                             <textarea
