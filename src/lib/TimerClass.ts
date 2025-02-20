@@ -7,6 +7,7 @@ export default class TimerClass {
     private activeFlag: boolean = false;    // current timer status
     private agitatingFlag: boolean = false; // current agitation status
     private duration: number;               // total duration of the timer
+    private endTime?: number;                // time when timer ends
     private startAgitationDuration: number; // first agitation duration
     private agitationInterval: number;      // interval on which the agitation should repeat
     private agitationDuration: number;      // repeated agitation duration
@@ -15,6 +16,7 @@ export default class TimerClass {
     private nextAgitationEnd?: number;      // time when the next agitation will end
     private timerId?: NodeJS.Timeout;       // timeout id for clearTimeout purposes
     private onComplete?: () => void;        // callback to be executed when the timer stops
+    private now: number = 0;
 
     // timer status
     get active(): boolean {
@@ -28,7 +30,7 @@ export default class TimerClass {
 
     // elapsed time since timer start
     get elapsedTime(): number {
-        return this.startTime ? Date.now() - this.startTime : 0;
+        return this.startTime ? this.now - this.startTime : 0;
     };
 
     private getDurationFromSeconds(totalSeconds: number) : Duration {
@@ -47,9 +49,9 @@ export default class TimerClass {
     get NextAgitationStartsIn(): Duration {
         if (this.agitatingFlag) return { h: 0, m: 0, s: 0 }; // Currently agitating
 
-        if (this.nextAgitationStart) {
-            const totalSecondsToAgitation = Math.floor((this.nextAgitationStart - Date.now()) / 1000);
-            
+        if (this.nextAgitationStart && this.nextAgitationStart < this.endTime!) { // go to else if nextAgitationStart is after endTime
+            const totalSecondsToAgitation = Math.floor((this.nextAgitationStart - this.now) / 1000);
+
             return totalSecondsToAgitation <= 0 ? { h: 0, m: 0, s: 0 } : this.getDurationFromSeconds(totalSecondsToAgitation);
         } else {
             return { h: 0, m: 0, s: 0 }
@@ -62,7 +64,7 @@ export default class TimerClass {
         if(!this.nextAgitationEnd) { // there is no agitation end value
             return { h: 0, m: 0, s: 0 };
         } else {
-            const totalSecondsToEndAgitation = Math.floor((this.nextAgitationEnd - Date.now()) / 1000);
+            const totalSecondsToEndAgitation = Math.floor((this.nextAgitationEnd - this.now) / 1000);
         
             return totalSecondsToEndAgitation <= 0 ? { h: 0, m: 0, s: 0 } : this.getDurationFromSeconds(totalSecondsToEndAgitation);
         }
@@ -88,6 +90,8 @@ export default class TimerClass {
         this.nextAgitationStart = undefined;
         this.nextAgitationEnd = undefined;
         this.startTime = Date.now();
+        this.endTime = this.startTime + this.duration;
+        this.now = this.startTime;
         this.loop();
     };
 
@@ -112,11 +116,11 @@ export default class TimerClass {
         if(!this.activeFlag) return; // ignore if not active
 
         const currentTime = Date.now();
+        this.now = currentTime;
 
         // Sets up first nextAgitationStart and nextAgitationEnd
         if (!this.nextAgitationStart && (this.agitationInterval > 0 || this.startAgitationDuration > 0)) {
-            // set first agitation based on start agitation
-            if (this.startAgitationDuration > 0) {
+            if (this.startAgitationDuration > 0) { // set first agitation based on start agitation
                 this.nextAgitationStart = this.startTime!;
                 this.nextAgitationEnd = this.nextAgitationStart + this.startAgitationDuration;
             } else if (this.agitationInterval > 0) { // sets first agitation based on interval
@@ -125,25 +129,29 @@ export default class TimerClass {
             }
         }
 
-        // Check if the main timer is over - stop timer and return
-        if (currentTime >= this.startTime! + this.duration) {
+        if (this.elapsedTime >= this.duration) { // Check if the main timer is over - stop timer and return
             playBeep(BeepFrequency.High, 1);
             this.stop();
             return;
         }
 
         // Check if next agitation time has passed
-        if (currentTime >= this.nextAgitationStart! && this.agitatingFlag == false) {
+        if (this.nextAgitationStart && currentTime >= this.nextAgitationStart! && this.agitatingFlag == false) {
             this.agitatingFlag = true;
             playBeep(BeepFrequency.Medium, 0.5);
-            this.nextAgitationStart = currentTime + this.agitationInterval;
+            this.nextAgitationStart = this.nextAgitationStart! + this.agitationInterval;
         }
 
         // Check if next agitation end has passed
-        if (currentTime >= this.nextAgitationEnd! && this.agitatingFlag == true) {
+        if (this.nextAgitationEnd && currentTime >= this.nextAgitationEnd! && this.agitatingFlag == true) {
             this.agitatingFlag = false;
             playBeep(BeepFrequency.Medium, 0.5);
-            this.nextAgitationEnd = this.nextAgitationStart! + this.agitationDuration;
+            if(this.nextAgitationStart! + this.agitationDuration >= this.endTime!) { // nextAgitationEnd should not surpass endTime
+                this.nextAgitationEnd = this.endTime;
+            } else {
+                this.nextAgitationEnd = this.nextAgitationStart! + this.agitationDuration;
+            }
+            
         }
 
         // call this function again
