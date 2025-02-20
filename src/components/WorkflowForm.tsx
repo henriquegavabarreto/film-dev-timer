@@ -137,7 +137,7 @@ export default function WorkflowForm(props: { resources: ResourcesData, editingW
 
     const renderCustomInput = (field: string, value: string, type: string, onChange: (e: React.ChangeEvent<HTMLInputElement>) => void) => {
         return field === "Other" ? (
-          <input maxLength={50} className="m-3 border rounded-sm border-zinc-400" type={type} value={value} onChange={onChange} />
+          <input maxLength={50} className="m-3 border rounded-sm border-zinc-400 text-zinc-800 dark:text-zinc-800" type={type} value={value} onChange={onChange} />
         ) : null;
     }
 
