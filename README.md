@@ -1,8 +1,23 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# My Film Development Workflow
+
+This is a Next.js project created to help me with my film developing process.
+
+I used to make notes in a little notepad and use my phone's timer, but this wasn’t very practical given the limited space I have—the bathroom sink. So, I created this app to make the process a little easier. Now, I can keep my step-by-step instructions, timers, notes, and usage history all in one place using just one device.
+
+I hope you find it useful too!
+
+## Usage
+
+1. Log in or create an account to start creating your own workflows.
+2. See your workflow list or create a new one. Add relevant information and steps (with timers) to help you in your process. Save it, and you can start using your new workflow. I like to add volume mixing in my step descriptions, as it helps with measuring later.
+3. Use the timers to complete your development process, and click the finish button to add it to your history with a note. I usually mention details like the temperature I used, in case I decide to edit the workflow later, and about the pictures to help me identify the negative later.
+4. View all your completed processes in the History section.
+
+# Dev
 
 ## Getting Started
 
-First, run the development server:
+Make sure you have a `.env` file with the required database and authentication information. Then you can run the development server:
 
 ```bash
 npm run dev
@@ -15,22 +30,3 @@ bun dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
