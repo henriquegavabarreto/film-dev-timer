@@ -2,7 +2,7 @@ import { WorkflowInfo } from "@/types/WorkflowInfo";
 import { Auth } from "firebase/auth";
 
 // get workflow with id
-export default async (id: string, auth: Auth): Promise<WorkflowInfo> => {
+export default async function getWorkflow(id: string, auth: Auth): Promise<WorkflowInfo> {
     if(!id) throw new Error('Could not find workflow id.');
     if(!auth.currentUser) throw new Error('User is not logged in.');
 
@@ -25,7 +25,10 @@ export default async (id: string, auth: Auth): Promise<WorkflowInfo> => {
         const retrievedWorkflow = await res.json();
 
         return retrievedWorkflow;
-    } catch (error: any) {
-        throw new Error(error.message || 'Failed to retrieve workflow');
+    } catch (error: unknown) {
+        if(error instanceof Error) {
+            throw new Error(error.message);
+        }
+        throw new Error('Failed to retrieve workflow');
     }
 }

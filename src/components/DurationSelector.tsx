@@ -4,17 +4,17 @@ import Duration from "@/types/Duration";
 import { useEffect, useState } from "react";
 
 // Custom input for timer duration
-export default function DurationSelector(props: { title: string, clue: string, value: Duration, onDurationChange: (duration: Duration) => void }) {
-    const [duration, setDuration] = useState<Duration>(props.value);
+export default function DurationSelector({ title, clue, value, onDurationChange }: { title: string, clue: string, value: Duration, onDurationChange: (duration: Duration) => void }) {
+    const [duration, setDuration] = useState<Duration>(value);
 
     // Update duration if the parent value changes (on edit)
     useEffect(() => {
-        setDuration(props.value);
-    }, [props.value]);
+        setDuration(value);
+    }, [value]);
 
     // trigger onDurationChange whenever the duration is updated
     useEffect(() => {
-        props.onDurationChange(duration);
+        onDurationChange(duration);
     }, [duration]);
 
     // handle input change for duration values
@@ -29,8 +29,8 @@ export default function DurationSelector(props: { title: string, clue: string, v
 
     return (
         <div className="p-4 rounded-md shadow-md">
-            <h5>{props.title}</h5>
-            <div className="mb-1 text-xs text-zinc-500">{props.clue}</div>
+            <h5>{title}</h5>
+            <div className="mb-1 text-xs text-zinc-500">{clue}</div>
             <div>
                 <input
                     className="mr-1 w-12 border border-zinc-400 rounded-sm text-zinc-600 dark:text-zinc-600"

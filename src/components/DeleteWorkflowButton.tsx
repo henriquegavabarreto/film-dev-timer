@@ -37,9 +37,12 @@ export default function DeleteWorkflowButton(props: { id: string | undefined, ha
                 setDeleting(false);
                 router.push('/workflow/list');
             }
-        } catch (error: any) {
+        } catch (error: unknown) {
             setDeleting(false);
-            setErrorMessage(error.message || 'Failed to delete workflow');
+            if(error instanceof Error) {
+                setErrorMessage(error.message);
+            }
+            setErrorMessage('Failed to delete workflow');
         }
         
     }
@@ -49,7 +52,7 @@ export default function DeleteWorkflowButton(props: { id: string | undefined, ha
             { errorMessage && <p className="text-red-600 m-4">{errorMessage}</p> }
             <button
                 className="m-4 p-4 font-semibold text-red-600 border-2 border-red-600 transition ease-in-out hover:bg-red-600 disabled:text-gray-400 disabled:border-gray-400 disabled:hover:bg-white hover:text-white rounded-md" 
-                onClick={e => handleDelete(props.id)}
+                onClick={() => handleDelete(props.id)}
                 disabled={deleting || props.hasActiveTimer}
                 >{deleting ? 'Deleting...' : 'Delete Workflow'}
             </button>

@@ -22,8 +22,14 @@ export default function SignUp() {
             await setPersistence(auth, browserSessionPersistence);
             await createUserWithEmailAndPassword(auth, email, password);
             router.push('/dashboard');
-        } catch (err: any) {
-            setError(getAuthErrorMessage(err.code));
+        } catch (error: unknown) {
+            if (typeof error === "object" && error !== null && "code" in error) {
+                setError(getAuthErrorMessage((error as { code: string }).code));
+            } else if (error instanceof Error) {
+                setError(getAuthErrorMessage(error.message));
+            } else {
+                setError("An unknown error occurred");
+            }
             setLoading(false);
         }
     };

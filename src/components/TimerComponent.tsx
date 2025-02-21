@@ -17,7 +17,7 @@ export default function TimerComponent(props: { stepInfo: StepInfo , hasActiveTi
     // Timer state and instance
     const [timer] = useState(() => new TimerClass(duration, startAgitationDuration, agitationInterval, agitationDuration, onComplete));
     const [isActive, setIsActive] = useState(false); // Track if timer is active
-    const [elapsedTime, setElapsedTime] = useState(0); // Track elapsed time
+    const [, setElapsedTime] = useState(0); // Track elapsed time
     const [checked, setChecked] = useState(false);
 
     // UEffect to update elapsed time when timer is active

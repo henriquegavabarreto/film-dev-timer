@@ -3,17 +3,17 @@
 import { useEffect, useState } from "react";
 
 // Custom input for Developer dilution
-export default function Dilution(props: { handleDilutionChange: (dilution: string) => void, initialValue?: string } ) {
+export default function Dilution({ handleDilutionChange, initialValue }: { handleDilutionChange: (dilution: string) => void, initialValue?: string }) {
     // set initial values when editing a workflow
-    const [solute, setSolute] = useState(props.initialValue ?
-        props.initialValue.slice(0, props.initialValue.indexOf('+')).trim() :
+    const [solute, setSolute] = useState(initialValue ?
+        initialValue.slice(0, initialValue.indexOf('+')).trim() :
         '0');
-    const [solvent, setSolvent] = useState(props.initialValue ?
-        props.initialValue.slice(props.initialValue.indexOf('+') + 1).trim() :
+    const [solvent, setSolvent] = useState(initialValue ?
+        initialValue.slice(initialValue.indexOf('+') + 1).trim() :
         '0');
-
+    
     useEffect(() => {
-        props.handleDilutionChange(`${solute} + ${solvent}`);
+        handleDilutionChange(`${solute} + ${solvent}`);
     },[solvent, solute])
 
     return (

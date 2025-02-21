@@ -3,14 +3,14 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 // Form to gather and save history information
-export default function HistoryItemForm( props: { workflowId: string, workflowTitle: string, hasActiveTimer: boolean }) {
+export default function HistoryItemForm( { workflowId, workflowTitle, hasActiveTimer }: { workflowId: string, workflowTitle: string, hasActiveTimer: boolean }) {
     const route = useRouter();
     const [showForm, setShowForm] = useState(false);
     const [notes, setNotes] = useState('');
     const [saving, setSaving] = useState(false);
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-    useEffect(() => {},[props.hasActiveTimer]); // update this component based on parent timer activity
+    useEffect(() => {},[hasActiveTimer]); // update this component based on parent timer activity
 
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>): Promise<void> => {
         event.preventDefault();
@@ -29,7 +29,7 @@ export default function HistoryItemForm( props: { workflowId: string, workflowTi
                     Authorization: `Bearer ${idToken}`,
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ notes: notes, workflowId: props.workflowId, workflowTitle: props.workflowTitle })
+                body: JSON.stringify({ notes: notes, workflowId: workflowId, workflowTitle: workflowTitle })
             });
 
             if (!res.ok) {
@@ -40,9 +40,12 @@ export default function HistoryItemForm( props: { workflowId: string, workflowTi
     
             setSaving(false);
             route.push('/history');
-        } catch (error: any) {
+        } catch (error: unknown) {
             setSaving(false);
-            setErrorMessage(error.message || 'Failed to add history item');
+            if(error instanceof Error) {
+                setErrorMessage(error.message);
+            }
+            setErrorMessage('Failed to add history item');
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
     }
@@ -50,9 +53,9 @@ export default function HistoryItemForm( props: { workflowId: string, workflowTi
     return (
         <div>
             <button
-                disabled={props.hasActiveTimer}
+                disabled={hasActiveTimer}
                 className="w-full font-semibold text-blue-600 border-2 border-blue-600 transition ease-in-out hover:bg-blue-600 hover:text-white py-2 px-4 disabled:text-gray-400 disabled:border-gray-400 disabled:hover:bg-white rounded-md"
-                onClick={e => setShowForm(true)}>Finish</button>
+                onClick={() => setShowForm(true)}>Finish</button>
             <dialog open={showForm}>
                 <div className="overflow-y-auto overflow-x-hidden flex fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full bg-slate-600 bg-opacity-80">
                     <div className="relative p-4 w-full max-w-2xl max-h-full">
@@ -62,7 +65,7 @@ export default function HistoryItemForm( props: { workflowId: string, workflowTi
                                     <div className="p-4 font-semibold text-xl">Add to History</div>
                                     <button
                                         className="p-3"
-                                        onClick={e => setShowForm(false)}
+                                        onClick={() => setShowForm(false)}
                                         disabled={saving}>X</button>
                                 </div>
                                 <form onSubmit={handleSubmit}>

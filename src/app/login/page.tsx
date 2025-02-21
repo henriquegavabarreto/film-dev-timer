@@ -23,8 +23,15 @@ export default function Login() {
             await setPersistence(auth, browserSessionPersistence);
             await signInWithEmailAndPassword(auth, email, password);
             router.push('/workflow/list'); // redirect to workflow list after log in
-        } catch (err: any) {
-            setError(getAuthErrorMessage(err.code));
+        } catch (error: unknown) {
+            if (typeof error === "object" && error !== null && "code" in error) {
+                setError(getAuthErrorMessage((error as { code: string }).code));
+            } else if (error instanceof Error) {
+                setError(error.message);
+            } else {
+                setError("An unknown error occurred");
+            }
+
             setLoading(false);
         }
     };

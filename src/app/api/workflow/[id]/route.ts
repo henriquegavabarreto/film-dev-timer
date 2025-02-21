@@ -22,8 +22,11 @@ export async function GET (req: Request, { params }: { params: { id: string } })
         doc.createdAt = doc.createdAt.toDate();
 
         return NextResponse.json({ ...doc }, { status: 201 });
-    } catch (error: any) {
-        return NextResponse.json({ error: 'Failed to get user workflow', message: error.message }, { status: 500 });
+    } catch (error: unknown) {
+        if (error instanceof Error) {
+            return NextResponse.json({ error: error.message }, { status: 500 });
+        }
+        return NextResponse.json({ error: 'Failed to get user workflow'  }, { status: 500 });
     }
 }
 
@@ -50,8 +53,11 @@ export async function DELETE (req: Request, { params }: { params: { id: string }
         await updateHistory(token.uid, id);
 
         return NextResponse.json({ message: 'Workflow deleted successfully' }, { status: 201 });
-    } catch (error: any) {
-        return NextResponse.json({ error: 'Failed to delete workflow', message: error.message }, { status: 500 });
+    } catch (error: unknown) {
+        if (error instanceof Error) {
+            return NextResponse.json({ error: error.message }, { status: 500 });
+        }
+        return NextResponse.json({ error: 'Failed to delete workflow'  }, { status: 500 });
     }    
 }
 
@@ -72,7 +78,10 @@ const updateHistory = async (uid: string, id: string) => {
         }
 
         await docRef.set({ history: [...doc.history] });
-    } catch (error: any) {
-        throw new Error(error.message);
+    } catch (error: unknown) {
+        if (error instanceof Error) {
+            throw new Error(error.message);
+        }
+        throw new Error('Failed to update history.');
     }
 }

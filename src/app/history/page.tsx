@@ -27,8 +27,11 @@ export default function HistoryPage () {
             const data = await res.json();
 
             return data.history;
-        } catch (error: any) {
-            throw new Error(error.message || 'Failed to retrieve history items.');
+        } catch (error: unknown) {
+            if (error instanceof Error) {
+                throw new Error(error.message);
+            }
+            throw new Error('Failed to retrieve history items.');
         }
     }
     const { data, error, isLoading } = useSWR<WorkflowHistoryItem[]>(

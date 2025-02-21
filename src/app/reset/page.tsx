@@ -19,8 +19,11 @@ export default function Reset() {
             setLoading(false);
             setError(null);
             setSent(true);
-        } catch (err: any) {
-            setError(err.message);
+        } catch (error: unknown) {
+            if (error instanceof Error) {
+                setError(error.message);
+            }
+            setError('Unknown error occurred.');
             setLoading(false);
         }
     };

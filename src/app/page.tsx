@@ -12,7 +12,7 @@ export default function Home() {
       <h3 className="mx-10 mb-5 mt-10 text-xl font-semibold">What Are Workflows?</h3>
       <p className="mx-10 w-1/2">
           Workflows are sequences of timed steps that guide your film development process. Since every 
-          photographer's approach is unique, workflows are fully customizable.<br/>
+          photographer&apos;s approach is unique, workflows are fully customizable.<br/>
           After creating an account and logging in, you can create new workflows and access them in your 
           workflow list.<br/>
           For each step, you can add details like the volume and dilution of chemicals, the type of 

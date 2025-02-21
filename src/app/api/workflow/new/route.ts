@@ -1,6 +1,7 @@
 import { getDecodedToken } from "@/lib/authHelpers";
 import { adminDb } from "@/lib/firebaseAdmin";
 import { validateCommonData } from "@/lib/validationHelpers";
+import { WorkflowInfo } from "@/types/WorkflowInfo";
 import { Timestamp } from "firebase-admin/firestore";
 import { NextResponse } from "next/server";
 
@@ -11,7 +12,7 @@ export async function POST(req: Request) {
 
         const data = await new Response(req.body).json(); // get data from request
 
-        validateCommonData(data);
+        validateCommonData(data as WorkflowInfo);
 
         // add timestamp and user information
         const docRef = await adminDb.collection('workflow').add({
@@ -29,8 +30,10 @@ export async function POST(req: Request) {
         });
 
         return NextResponse.json({ message: 'Workflow added', id: docRef.id }, { status: 201 });
-    } catch (error: any) {
-        console.error('Error adding Workflow:', error);
-        return NextResponse.json({ error: 'Failed to add workflow', message: error.message }, { status: 500 });
+    } catch (error: unknown) {
+        if (error instanceof Error) {
+            return NextResponse.json({ error: error.message }, { status: 500 });
+        }
+        return NextResponse.json({ error: 'Failed to add workflow'  }, { status: 500 });
     }
 }

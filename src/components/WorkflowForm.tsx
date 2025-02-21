@@ -3,7 +3,7 @@
 import FilmFormat from "@/types/FilmFormat";
 import { ResourcesData } from "@/types/ResourcesData";
 import { WorkflowInfo } from "@/types/WorkflowInfo";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Dilution from "./Dilution";
 import StepInfoForm from "./StepInfoForm";
 import StepInfo from "@/types/StepInfo";
@@ -40,7 +40,7 @@ export default function WorkflowForm(props: { resources: ResourcesData, editingW
     };
 
     const getUpdatedData = (data: WorkflowInfo) => {
-        let updatedData = data;
+        const updatedData = data;
 
         if(customData.customFilmName !== "" && workflowInfo.film == "Other") {
             updatedData.film = customData.customFilmName;
@@ -124,12 +124,14 @@ export default function WorkflowForm(props: { resources: ResourcesData, editingW
             }
     
             const resData = await res.json();
-            console.log('Workflow created successfully');
             setSaving(false);
             setSelectedWorkflow(workflowInfo);
             route.push(`/workflow/${resData.id}`);
-        } catch (error: any) {
-            setErrorMessage(error.message);
+        } catch (error: unknown) {
+            if(error instanceof Error) {
+                setErrorMessage(error.message);
+            }
+            setErrorMessage("An unexpected error occurred.");
             setSaving(false);
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
@@ -279,9 +281,9 @@ export default function WorkflowForm(props: { resources: ResourcesData, editingW
                         {renderCustomInput(workflowInfo.developer, customData.customDeveloperName, "text", (e) => setCustomData(prevData => ( {...prevData, customDeveloperName: e.target.value })))}
                     </div>
                     <Dilution
-                        handleDilutionChange={(dilution: string): void => {
-                            setWorkflowInfo(prevWorkflow => ( {...prevWorkflow, dilution: dilution }))
-                        }}
+                        handleDilutionChange={useCallback((dilution: string) => {
+                            setWorkflowInfo(prevWorkflow => ({ ...prevWorkflow, dilution }));
+                        }, [])}
                         initialValue={props.editingWorkflow && workflowInfo.dilution}
                     />
                     <div className="lg:m-3 lg:w-1/3 mx-3 my-1 flex flex-col">
@@ -307,7 +309,7 @@ export default function WorkflowForm(props: { resources: ResourcesData, editingW
                                     stepInfo={step}
                                     onEdit={(id: string): void  => {
                                         const selectedStep = workflowInfo.steps.find(step => step.id === id);
-                                        selectedStep && setEditStep(selectedStep);
+                                        if(selectedStep) setEditStep(selectedStep);
                                         setShowDialog(true);
                                     } }
                                     onDelete={(id: string): void => {

@@ -12,7 +12,7 @@ export async function POST(req: Request) {
 
         const data = await new Response(req.body).json(); // get data from request
 
-        validateCommonData(data);
+        validateCommonData(data as WorkflowInfo);
 
         // get fresh data from the database
         const currentWorkflow = await getFreshWorkflow(data.id) as WorkflowInfo;
@@ -39,8 +39,11 @@ export async function POST(req: Request) {
         });
 
         return NextResponse.json({ message: 'Workflow updated', ...data }, { status: 201 });
-    } catch (error: any) {
-        return NextResponse.json({ error: 'Failed to update workflow', message: error.message }, { status: 500 });
+    } catch (error: unknown) {
+        if (error instanceof Error) {
+            return NextResponse.json({ error: error.message }, { status: 500 });
+        }
+        return NextResponse.json({ error: 'Failed to update workflow'  }, { status: 500 });
     }
 }
 

@@ -1,5 +1,6 @@
 import FilmFormat from "@/types/FilmFormat";
 import StepInfo from "@/types/StepInfo";
+import { WorkflowInfo } from "@/types/WorkflowInfo";
 
 export const validateLength = (str: string, maxLength: number) => {
     if (str.length > maxLength) {
@@ -7,7 +8,7 @@ export const validateLength = (str: string, maxLength: number) => {
     } 
 }
 
-export const validateCommonData = (data: any) => {
+export const validateCommonData = (data: WorkflowInfo) => {
     const validStepAttributes = [
         'id',
         'title',

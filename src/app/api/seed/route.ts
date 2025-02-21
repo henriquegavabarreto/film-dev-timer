@@ -25,7 +25,10 @@ export async function POST() {
         } else {
             return NextResponse.json({ message: 'resources collection already exists' });
         }
-    } catch (error) {
-        return NextResponse.json({ message: 'Failed to seed database' });
+    } catch (error: unknown) {
+        if (error instanceof Error) {
+            return NextResponse.json({ error: error.message }, { status: 500 });
+        }
+        return NextResponse.json({ error: 'Failed to seed database'  }, { status: 500 });
     }
 }

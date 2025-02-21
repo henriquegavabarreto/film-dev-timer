@@ -7,7 +7,7 @@ import Duration from "@/types/Duration";
 import parseDurationToMs from "@/lib/parseDurationToMs";
 
 // Form to gather and save step information for a workflow
-export default function StepInfoForm(props: { onSaveStep: (info: StepInfo) => void, editingStepInfo?: StepInfo | null, onClose: () => void }) {
+export default function StepInfoForm({ onSaveStep, editingStepInfo, onClose }: { onSaveStep: (info: StepInfo) => void, editingStepInfo?: StepInfo | null, onClose: () => void }) {
     const durationFields: {title: string, clue: string, key: keyof StepInfo}[] = [
         { title: "Duration", clue:"Total duration for this step", key: "duration" },
         { title: "Start Agitation Duration", clue:"Duration of initial agitation", key: "startAgitationDuration" },
@@ -28,8 +28,8 @@ export default function StepInfoForm(props: { onSaveStep: (info: StepInfo) => vo
     const defaultFormUi = {formTitle: 'New Step', buttonText: 'Add Step'};
     const editingFormUi = {formTitle: 'Editing Step', buttonText: 'Update Step'};
 
-    const [stepInfo, setStepInfo] = useState<StepInfo>(props.editingStepInfo || defaultStepInfo);
-    const [uiText, setUiText] = useState<{formTitle: string, buttonText: string}>(props.editingStepInfo ? editingFormUi : defaultFormUi);
+    const [stepInfo, setStepInfo] = useState<StepInfo>(editingStepInfo || defaultStepInfo);
+    const [uiText, setUiText] = useState<{formTitle: string, buttonText: string}>(editingStepInfo ? editingFormUi : defaultFormUi);
 
     const saveStep = (e: React.FormEvent): void => {
         e.preventDefault();
@@ -37,24 +37,33 @@ export default function StepInfoForm(props: { onSaveStep: (info: StepInfo) => vo
             alert('Title, Description and Duration must be filled to add a step.');
             return;
         }
-        props.onSaveStep(stepInfo);
+        onSaveStep(stepInfo);
         setStepInfo(defaultStepInfo); // Reset the form after saving
         setUiText(defaultFormUi);
     };
 
     useEffect(() => {
-        if (props.editingStepInfo) {
-            setStepInfo(props.editingStepInfo); // Update the form when editingStepInfo changes
+        if (editingStepInfo) {
+            setStepInfo(editingStepInfo); // Update the form when editingStepInfo changes
             setUiText(editingFormUi); // update ui to reflect user action
         }
-    }, [props.editingStepInfo]);
+    }, [editingStepInfo]);
 
     function closeDialog(event: React.MouseEvent<HTMLButtonElement, MouseEvent>): void {
         event.preventDefault();
         setStepInfo(defaultStepInfo);
         setUiText(defaultFormUi);
-        props.onClose();
+        onClose();
     }
+
+    const handleDurationChange = useCallback(
+        (key: string, duration: Duration) => {
+            setStepInfo(prevState => ({
+                ...prevState,
+                [key]: duration
+            }));
+        }, [setStepInfo]
+    );
 
     return (
         <div className="overflow-y-auto overflow-x-hidden flex fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full bg-slate-600 bg-opacity-80">
@@ -93,12 +102,7 @@ export default function StepInfoForm(props: { onSaveStep: (info: StepInfo) => vo
                                 title={title}
                                 clue={clue}
                                 value={stepInfo[key] as Duration}
-                                onDurationChange={useCallback((duration: Duration) => {
-                                    setStepInfo(prevState => ({
-                                        ...prevState,
-                                        [key]: duration
-                                    }));
-                                }, [setStepInfo])}
+                                onDurationChange={(duration: Duration) => handleDurationChange(key, duration)}
                             />
                         ))}
                         <div className="mt-5 text-center">

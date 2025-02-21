@@ -11,7 +11,7 @@ export default async function EditWorkflowPage() {
                 <EditWorkflow {...resources} />
             </div>
         );
-    } catch (error) {
+    } catch {
         return (
             <div className="flex align-center justify-center mt-5">Resources could not be loaded. Try again in a few minutes.</div>
         );

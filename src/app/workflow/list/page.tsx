@@ -25,11 +25,14 @@ export default function WorkflowListPage() {
                 throw new Error(errorData.message || 'Failed to get workflow list.');
             }
         
-            let workflowData = await res.json();
+            const workflowData = await res.json();
 
             return workflowData;
-        } catch (error: any) {
-            throw new Error(error.message || 'An expected error occurred while fetching the workflow list.');
+        } catch (error: unknown) {
+            if (error instanceof Error) {
+                throw new Error(error.message);
+            }
+            throw new Error('An expected error occurred while fetching the workflow list.');
         }
     }
 

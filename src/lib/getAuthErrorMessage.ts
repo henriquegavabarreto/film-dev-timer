@@ -13,6 +13,8 @@ export const getAuthErrorMessage = (errorCode: string): string => {
       return 'The email address is already in use.';
     case 'auth/weak-password':
       return 'The password is too weak. Please choose a stronger password.';
+    case 'auth/invalid-credential':
+      return 'User or password incorrect. Check those and try again';
     default:
       return 'An unexpected error occurred. Please try again.';
   }

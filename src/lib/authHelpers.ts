@@ -1,7 +1,7 @@
 import { DecodedIdToken } from "firebase-admin/auth";
 import { adminAuth } from "./firebaseAdmin";
 
-const getDecodedToken = async (req: any): Promise<DecodedIdToken> => {
+const getDecodedToken = async (req: Request): Promise<DecodedIdToken> => {
     try {
         const authHeader = req.headers.get('Authorization');
         
@@ -17,7 +17,10 @@ const getDecodedToken = async (req: any): Promise<DecodedIdToken> => {
         }
 
         return decodedToken;
-    } catch (error) {
+    } catch (error: unknown) {
+        if(error instanceof Error) {
+            throw new Error(error.message)
+        }
         throw new Error('Could not verify token.')
     }
 }

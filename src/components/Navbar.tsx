@@ -20,17 +20,20 @@ export default function NavBar()
             setUser(user);
         } else {
             setUser(null);
-            router.push('/'); // redirects to home if user is null
         }
         });
         return () => unsubscribe();
-    }, [auth]);
+    }, [router]);
 
     const handleLogout = async () => {
         try {
             await signOut(auth);
-        } catch (error: any) {
-            setLogOutError(error.message);
+            router.push('/'); // redirects to home if user is null
+        } catch (error: unknown) {
+            if(error instanceof Error) {
+                setLogOutError(error.message);
+            }
+            setLogOutError("Could not log out at this time.");
         }
     };
 

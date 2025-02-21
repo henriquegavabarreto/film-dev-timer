@@ -14,8 +14,11 @@ const getHistoryDoc = async (uid: string): Promise<FirebaseFirestore.DocumentDat
         const doc = querySnapshot.data();
 
         return doc;
-    } catch (error: any) {
-        throw new Error(error.message);
+    } catch (error: unknown) {
+        if (error instanceof Error) {
+            throw new Error(error.message);
+        }
+        throw new Error("An unknown error occurred");
     }
 }
 
@@ -28,12 +31,21 @@ export async function GET (req: Request) {
 
         if(!doc) throw new Error('History not found.');
 
-        doc.history.forEach((item: any) => {
-            item.createdAt = item.createdAt.toDate();
+        const history: WorkflowHistoryItem[] = [];
+
+        doc.history.forEach((item: { createdAt: Timestamp, workflowId: string, workflowTitle: string, notes: string }) => {
+            history.push({ 
+                createdAt: item.createdAt.toDate(),
+                workflowId: item.workflowId,
+                workflowTitle: item.workflowTitle,
+                notes: item.notes });
         })
 
-        return NextResponse.json({ ...doc }, { status: 201 });
-    } catch (error) {
+        return NextResponse.json({ history }, { status: 201 });
+    } catch (error: unknown) {
+        if (error instanceof Error) {
+            return NextResponse.json({ error: error.message }, { status: 500 });
+        }
         return NextResponse.json({ error: 'Could not get History.' }, { status: 500 });
     }
 }
@@ -51,7 +63,7 @@ export async function POST(req: Request) {
         validateLength(data.notes, 500);
 
         // get existing information
-        let doc = await getHistoryDoc(decodedToken.uid);
+        const doc = await getHistoryDoc(decodedToken.uid);
 
         const docRef = adminDb.collection('history').doc(decodedToken.uid);
 
@@ -70,7 +82,10 @@ export async function POST(req: Request) {
         }
 
         return NextResponse.json({message: 'History added', ...data}, { status: 201 });
-    } catch (error: any) {
-        return NextResponse.json({ error: 'Failed to add history item', message: error.message }, { status: 500 });
+    } catch (error: unknown) {
+        if (error instanceof Error) {
+            return NextResponse.json({ error: error.message }, { status: 500 });
+        }
+        return NextResponse.json({ error: 'Failed to add history item' }, { status: 500 });
     }
 }
