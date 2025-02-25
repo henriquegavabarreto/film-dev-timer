@@ -2,17 +2,17 @@ import StepInfo from "@/types/StepInfo";
 import DurationDisplay from "./DurationDisplay";
 
 // Display step information for workflow form
-export default function Step(props: {stepInfo: StepInfo, onEdit: (id: string) => void, onDelete: (id: string) => void}) {
-    const { id, title, description, duration, startAgitationDuration, agitationInterval, agitationDuration} = props.stepInfo;
+export default function Step({ stepInfo, onEdit, onDelete}: {stepInfo: StepInfo, onEdit: (id: string) => void, onDelete: (id: string) => void}) {
+    const { id, title, description, duration, startAgitationDuration, agitationInterval, agitationDuration} = stepInfo;
     
     const editStep = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>): void => {
         event.preventDefault();
-        props.onEdit(id); // edit step with id
+        onEdit(id); // edit step with id
     }
 
     const deleteStep = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>): void => {
         event.preventDefault();
-        props.onDelete(id); // delete step with id
+        onDelete(id); // delete step with id
     }
 
     return (

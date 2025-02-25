@@ -4,7 +4,7 @@ import { WorkflowInfo } from "@/types/WorkflowInfo";
 
 export const validateLength = (str: string, maxLength: number) => {
     if (str.length > maxLength) {
-        throw new Error('String values must respect maximum lengths.');
+        throw new Error(`String values must respect maximum lengths. "${str.substring(0, 10)}..." maximum length is ${maxLength} characters.`);
     } 
 }
 

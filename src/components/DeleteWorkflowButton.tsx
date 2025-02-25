@@ -12,8 +12,8 @@ export default function DeleteWorkflowButton(props: { id: string | undefined, ha
 
     const handleDelete = async (id: string | undefined) => {
         try {
-            if(window.confirm('Are you sure you want to delete this workflow?')) { // confirm deletion
-                setErrorMessage(null);
+            if(window.confirm('Are you sure you want to delete this workflow?')) { // confirm deletion before taking action
+                setErrorMessage(null); // set error message to null
                 setDeleting(true);
 
                 if(!id) throw new Error('Could not find workflow id');
@@ -31,18 +31,19 @@ export default function DeleteWorkflowButton(props: { id: string | undefined, ha
     
                 if (!res.ok) {
                     const errorData = await res.json();
-                    throw new Error(errorData.message || 'Failed to delete workflow');
+                    throw new Error(errorData.error || 'Failed to delete workflow');
                 }
     
                 setDeleting(false);
-                router.push('/workflow/list');
+                router.push('/workflow/list'); // go back to list after deletion
             }
         } catch (error: unknown) {
             setDeleting(false);
             if(error instanceof Error) {
                 setErrorMessage(error.message);
+            } else {
+                setErrorMessage('Failed to delete workflow');
             }
-            setErrorMessage('Failed to delete workflow');
         }
         
     }

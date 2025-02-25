@@ -20,14 +20,15 @@ interface CustomData {
 
 // Form to gather and save workflow information - Can either be new with default info or an edit with loaded workflow info
 export default function WorkflowForm(props: { resources: ResourcesData, editingWorkflow?: WorkflowInfo }) {
-    const { setSelectedWorkflow } = useWorkflowContext();
-    const defaultCustomData = {
+    const { setSelectedWorkflow } = useWorkflowContext(); // get context
+    
+    const defaultCustomData = { // set default information for custom resources
         customFilmName: "",
         customDeveloperName: "",
         customIso: "0"
     };
 
-    const defaultWorkflow: WorkflowInfo = {
+    const defaultWorkflow: WorkflowInfo = { // set default info for workflow
         film: "",
         filmFormat: FilmFormat.F35mm,
         iso: "100",
@@ -39,7 +40,7 @@ export default function WorkflowForm(props: { resources: ResourcesData, editingW
         steps: []
     };
 
-    const getUpdatedData = (data: WorkflowInfo) => {
+    const getUpdatedData = (data: WorkflowInfo) => { // get user custom resource data
         const updatedData = data;
 
         if(customData.customFilmName !== "" && workflowInfo.film == "Other") {
@@ -68,9 +69,9 @@ export default function WorkflowForm(props: { resources: ResourcesData, editingW
     }
 
     useEffect(() => {
-        // If the workflow is being edited
+        // If the workflow is not new, but being edited
         if(props.editingWorkflow) {
-            // check if current values are part of resources and adjust input field values accordingly
+            // check if current values are part of resources and adjust input field values accordingly if custom
             if(!props.resources.developers.includes(workflowInfo.developer)){
                 setCustomData(prevData => ( {...prevData, customDeveloperName: workflowInfo.developer }))
                 changeWorkflowProperty('developer', "Other");
@@ -93,20 +94,21 @@ export default function WorkflowForm(props: { resources: ResourcesData, editingW
         setSaving(true);
 
         if(workflowInfo.steps.length <= 0) {
-            alert('Workflows must have at least one step');
+            setErrorMessage('Workflows must have at least one step');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
             setSaving(false);
             return;
         }
 
         try {
-            setErrorMessage(null);
+            setErrorMessage(null); // clean error messages
             if(!auth.currentUser) throw new Error('User is not logged in');
 
-            const idToken = await auth.currentUser.getIdToken();
+            const idToken = await auth.currentUser.getIdToken(); // get idToken
 
-            const data = getUpdatedData(workflowInfo);
+            const data = getUpdatedData(workflowInfo); // update custom data if needed
 
-            const url = props.editingWorkflow ? '/api/workflow/update' : '/api/workflow/new';
+            const url = props.editingWorkflow ? '/api/workflow/update' : '/api/workflow/new'; // update if editing workflow
 
             const res = await fetch(url, {
                 method: 'POST',
@@ -120,34 +122,38 @@ export default function WorkflowForm(props: { resources: ResourcesData, editingW
             if (!res.ok) {
                 setSaving(false);
                 const errorData = await res.json();
-                throw new Error(errorData.message || 'Failed to create workflow');
+                throw new Error(errorData.error || 'Failed to create workflow');
             }
     
             const resData = await res.json();
             setSaving(false);
-            setSelectedWorkflow(workflowInfo);
-            route.push(`/workflow/${resData.id}`);
+            setSelectedWorkflow(workflowInfo); // update context
+            route.push(`/workflow/${resData.id}`); // show workflow
         } catch (error: unknown) {
             if(error instanceof Error) {
                 setErrorMessage(error.message);
+            } else {
+                setErrorMessage("An unexpected error occurred.");
             }
-            setErrorMessage("An unexpected error occurred.");
             setSaving(false);
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
     }
 
+    // show input field when needed to add a custom resource
     const renderCustomInput = (field: string, value: string, type: string, onChange: (e: React.ChangeEvent<HTMLInputElement>) => void) => {
         return field === "Other" ? (
           <input maxLength={50} className="m-3 border rounded-sm border-zinc-400 text-zinc-800 dark:text-zinc-800" type={type} value={value} onChange={onChange} />
         ) : null;
     }
 
+    // handles step info dialog open
     const handleDialog = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>): void => {
         event.preventDefault();
         setShowDialog(true);
     }
 
+    // handles step info dialog close
     const onCloseDialog = () => {
         setShowDialog(false);
     }

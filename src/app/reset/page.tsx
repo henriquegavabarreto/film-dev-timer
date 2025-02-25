@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { sendPasswordResetEmail } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
+import { getAuthErrorMessage } from '@/lib/getAuthErrorMessage';
 
 export default function Reset() {
     const [email, setEmail] = useState('');
@@ -12,18 +13,21 @@ export default function Reset() {
 
     const handleReset = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        setError(null);
+        setError(null); // set any error message to null
         setLoading(true);
         try {
             await sendPasswordResetEmail(auth, email);
             setLoading(false);
             setError(null);
-            setSent(true);
+            setSent(true); // this prevents the form from rendering
         } catch (error: unknown) {
-            if (error instanceof Error) {
+            if (typeof error === "object" && error !== null && "code" in error) { // if the firebase call returns an error
+                setError(getAuthErrorMessage((error as { code: string }).code));
+            } else if (error instanceof Error) {
                 setError(error.message);
+            } else {
+                setError("An unknown error occurred");
             }
-            setError('Unknown error occurred.');
             setLoading(false);
         }
     };

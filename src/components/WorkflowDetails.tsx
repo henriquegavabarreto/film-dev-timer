@@ -11,6 +11,7 @@ export default function WorkflowDetails (props: { workflow: WorkflowInfo }) {
     const { workflow } = props;
 
     // track timer activity to prevent some user interaction when there is an active timer
+    // one timer can't be activated if there is one timer already running
     const [hasActiveTimer, setHasActiveTimer] = useState(false);
     
     function handleTimerChange(value: boolean) {

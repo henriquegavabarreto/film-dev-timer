@@ -13,16 +13,17 @@ export default function EditWorkflow(resources: ResourcesData) {
     const params = useParams();
     const id = Array.isArray(params.id) ? params.id[0] : params.id;
 
-    const { selectedWorkflow, setSelectedWorkflow } = useWorkflowContext();
+    const { selectedWorkflow, setSelectedWorkflow } = useWorkflowContext(); // get context
 
-    const shouldFetch = !selectedWorkflow || selectedWorkflow.id !== id;
+    const shouldFetch = !selectedWorkflow || selectedWorkflow.id !== id; // fetch if there is no valid workflow to display
 
+    // fetch workflow if needed
     const { data, error, isLoading } = useSWR<WorkflowInfo>(shouldFetch ? `/workflow/${id}` : null, () => getWorkflow(id, auth));
 
     if (isLoading) return <div>loading...</div>
     if (error) return <div>failed to load</div>
 
-    const workflow = data || selectedWorkflow || null;
+    const workflow = data || selectedWorkflow || null; // use fetched data or workflow from context
     
     if (!workflow) return <div>No workflow found</div>;
 

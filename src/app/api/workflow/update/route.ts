@@ -9,17 +9,33 @@ export async function POST(req: Request) {
 
     try {
         const decodedToken = await getDecodedToken(req); // check if token is valid
+        if(!decodedToken) return NextResponse.json({ error: 'Request unauthorized. Invalid or missing token' }, { status: 401 });
 
         const data = await new Response(req.body).json(); // get data from request
 
-        validateCommonData(data as WorkflowInfo);
+        // try catch for validation errors
+        try {
+            validateCommonData(data as WorkflowInfo);
+        } catch (error: unknown) {
+            if (error instanceof Error) {
+                return NextResponse.json({ error: error.message }, { status: 400 });
+            }
+            return NextResponse.json({ error: 'Could not validate submitted data.' }, { status: 500 });
+        }
+        
 
-        // get fresh data from the database
-        const currentWorkflow = await getFreshWorkflow(data.id) as WorkflowInfo;
+        // get fresh data from the database to check authorization
+        const docRef = adminDb.collection('workflow').doc(data.id); // get doc ref with id
+
+        const querySnapshot = await docRef.get(); // get snapshot
+
+        const doc = querySnapshot.data(); // get data
+
+        if(!doc) return NextResponse.json({ error: `Workflow ${data.id} not found.` }, { status: 404 });
 
         // check if user is allowed to modify
-        if(decodedToken.uid !== currentWorkflow.createdBy) {
-            throw new Error('Workflow can be modified only by its owner.');
+        if(decodedToken.uid !== doc.createdBy) {
+            return NextResponse.json({ error: 'Request unauthorized. A user can modify only their workflows.' }, { status: 401 });
         }
 
         // Change provided data, but keep createdAt
@@ -43,18 +59,6 @@ export async function POST(req: Request) {
         if (error instanceof Error) {
             return NextResponse.json({ error: error.message }, { status: 500 });
         }
-        return NextResponse.json({ error: 'Failed to update workflow'  }, { status: 500 });
+        return NextResponse.json({ error: 'Failed to update workflow' }, { status: 500 });
     }
-}
-
-async function getFreshWorkflow(id: string): Promise<FirebaseFirestore.DocumentData> {
-    const docRef = adminDb.collection('workflow').doc(id); // get doc ref with id
-
-        const querySnapshot = await docRef.get(); // get snapshot
-
-        const doc = querySnapshot.data(); // get data
-
-        if(!doc) throw new Error(`Workflow ${id} was not found.`);
-
-        return doc;
 }

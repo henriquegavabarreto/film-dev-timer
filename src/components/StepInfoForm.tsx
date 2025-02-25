@@ -28,7 +28,8 @@ export default function StepInfoForm({ onSaveStep, editingStepInfo, onClose }: {
     const defaultFormUi = {formTitle: 'New Step', buttonText: 'Add Step'};
     const editingFormUi = {formTitle: 'Editing Step', buttonText: 'Update Step'};
 
-    const [stepInfo, setStepInfo] = useState<StepInfo>(editingStepInfo || defaultStepInfo);
+    const [stepInfo, setStepInfo] = useState<StepInfo>(editingStepInfo || defaultStepInfo); // set form info
+    // set ui text according to user action (editing or new step)
     const [uiText, setUiText] = useState<{formTitle: string, buttonText: string}>(editingStepInfo ? editingFormUi : defaultFormUi);
 
     const saveStep = (e: React.FormEvent): void => {
@@ -39,7 +40,7 @@ export default function StepInfoForm({ onSaveStep, editingStepInfo, onClose }: {
         }
         onSaveStep(stepInfo);
         setStepInfo(defaultStepInfo); // Reset the form after saving
-        setUiText(defaultFormUi);
+        setUiText(defaultFormUi); // set ui text to default
     };
 
     useEffect(() => {
@@ -49,7 +50,7 @@ export default function StepInfoForm({ onSaveStep, editingStepInfo, onClose }: {
         }
     }, [editingStepInfo]);
 
-    function closeDialog(event: React.MouseEvent<HTMLButtonElement, MouseEvent>): void {
+    function closeDialog(event: React.MouseEvent<HTMLButtonElement, MouseEvent>): void { // close dialog and cleanup
         event.preventDefault();
         setStepInfo(defaultStepInfo);
         setUiText(defaultFormUi);

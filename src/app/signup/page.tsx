@@ -16,17 +16,17 @@ export default function SignUp() {
 
     const handleSignUp = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        setError(null);
+        setError(null); // set any error message to null
         setLoading(true);
         try {
-            await setPersistence(auth, browserSessionPersistence);
-            await createUserWithEmailAndPassword(auth, email, password);
-            router.push('/dashboard');
+            await setPersistence(auth, browserSessionPersistence); // set persistence to user current tab
+            await createUserWithEmailAndPassword(auth, email, password); // authenticate with firebase
+            router.push('/workflow/list'); // redirect to workflow list after log in
         } catch (error: unknown) {
             if (typeof error === "object" && error !== null && "code" in error) {
                 setError(getAuthErrorMessage((error as { code: string }).code));
             } else if (error instanceof Error) {
-                setError(getAuthErrorMessage(error.message));
+                setError(error.message);
             } else {
                 setError("An unknown error occurred");
             }

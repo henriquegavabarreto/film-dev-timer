@@ -17,14 +17,14 @@ export default function Login() {
 
     const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        setError(null);
+        setError(null); // set any error message to null
         setLoading(true);
         try {
-            await setPersistence(auth, browserSessionPersistence);
-            await signInWithEmailAndPassword(auth, email, password);
+            await setPersistence(auth, browserSessionPersistence); // set persistence to user current tab
+            await signInWithEmailAndPassword(auth, email, password); // authenticate with firebase
             router.push('/workflow/list'); // redirect to workflow list after log in
         } catch (error: unknown) {
-            if (typeof error === "object" && error !== null && "code" in error) {
+            if (typeof error === "object" && error !== null && "code" in error) { // if the firebase call returns an error
                 setError(getAuthErrorMessage((error as { code: string }).code));
             } else if (error instanceof Error) {
                 setError(error.message);

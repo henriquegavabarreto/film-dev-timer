@@ -14,7 +14,7 @@ export async function POST(req: Request) {
 
         validateCommonData(data as WorkflowInfo);
 
-        // add timestamp and user information
+        // add timestamp and user provided information and add document
         const docRef = await adminDb.collection('workflow').add({
             film: data.film,
             filmFormat: data.filmFormat,
@@ -34,6 +34,6 @@ export async function POST(req: Request) {
         if (error instanceof Error) {
             return NextResponse.json({ error: error.message }, { status: 500 });
         }
-        return NextResponse.json({ error: 'Failed to add workflow'  }, { status: 500 });
+        return NextResponse.json({ error: 'Failed to add workflow' }, { status: 500 });
     }
 }

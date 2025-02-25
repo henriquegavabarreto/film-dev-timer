@@ -17,13 +17,13 @@ export default function HistoryItemForm( { workflowId, workflowTitle, hasActiveT
         setSaving(true);
 
         try {
-            setErrorMessage(null);
+            setErrorMessage(null); // clean error messages
 
             if(!auth.currentUser) throw new Error('User is not logged in');
 
-            const idToken = await auth.currentUser.getIdToken();
+            const idToken = await auth.currentUser.getIdToken(); // get idToken
 
-            const res = await fetch('/api/history/', {
+            const res = await fetch('/api/history/', { // post data to history
                 method: 'POST',
                 headers: {
                     Authorization: `Bearer ${idToken}`,
@@ -35,18 +35,18 @@ export default function HistoryItemForm( { workflowId, workflowTitle, hasActiveT
             if (!res.ok) {
                 setSaving(false);
                 const errorData = await res.json();
-                throw new Error(errorData.message || 'Failed to add history item');
+                throw new Error(errorData.error || 'Failed to add history item');
             }
     
             setSaving(false);
-            route.push('/history');
+            route.push('/history'); // go to history and see all items
         } catch (error: unknown) {
-            setSaving(false);
+            setSaving(false); // make sure saving is false
             if(error instanceof Error) {
                 setErrorMessage(error.message);
+            } else {
+                setErrorMessage('Failed to add history item');
             }
-            setErrorMessage('Failed to add history item');
-            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
     }
 

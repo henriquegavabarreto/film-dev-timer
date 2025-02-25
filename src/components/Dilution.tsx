@@ -12,7 +12,7 @@ export default function Dilution({ handleDilutionChange, initialValue }: { handl
         initialValue.slice(initialValue.indexOf('+') + 1).trim() :
         '0');
     
-    useEffect(() => {
+    useEffect(() => { // update dilution value when solute and solvent are changed
         handleDilutionChange(`${solute} + ${solvent}`);
     },[solvent, solute])
 

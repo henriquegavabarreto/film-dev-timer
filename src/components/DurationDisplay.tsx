@@ -1,7 +1,6 @@
 import Duration from "@/types/Duration";
 
-// Displays Duration
-export default function DurationDisplay(props: Duration) {
+export default function DurationDisplay(props: Duration) { // Displays Duration
     const {h, m, s} = props;
 
     return (

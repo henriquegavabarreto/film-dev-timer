@@ -17,7 +17,7 @@ export default function TimerComponent(props: { stepInfo: StepInfo , hasActiveTi
     // Timer state and instance
     const [timer] = useState(() => new TimerClass(duration, startAgitationDuration, agitationInterval, agitationDuration, onComplete));
     const [isActive, setIsActive] = useState(false); // Track if timer is active
-    const [, setElapsedTime] = useState(0); // Track elapsed time
+    const [, setElapsedTime] = useState(0); // use setElapsedTime to update the ui
     const [checked, setChecked] = useState(false);
 
     // UEffect to update elapsed time when timer is active
@@ -54,7 +54,7 @@ export default function TimerComponent(props: { stepInfo: StepInfo , hasActiveTi
     };
 
     const handleCheck = (e: ChangeEvent<HTMLInputElement>) => {
-        if(isActive) { // cannot check if this timer is active
+        if(isActive) { // cannot check to disable if this timer is active
             setChecked(false);
             return;
         }
