@@ -3,7 +3,7 @@
 import FilmFormat from "@/types/FilmFormat";
 import { ResourcesData } from "@/types/ResourcesData";
 import { WorkflowInfo } from "@/types/WorkflowInfo";
-import { useCallback, useEffect, useState } from "react";
+import { ChangeEvent, useCallback, useEffect, useState } from "react";
 import Dilution from "./Dilution";
 import StepInfoForm from "./StepInfoForm";
 import StepInfo from "@/types/StepInfo";
@@ -11,6 +11,7 @@ import Step from "./Step";
 import { auth } from "@/lib/firebase";
 import { useRouter } from "next/navigation";
 import { useWorkflowContext } from "@/context/WorkflowContext";
+import CustomSelect from "./Form/CustomSelect";
 
 interface CustomData {
     customFilmName: string,
@@ -43,13 +44,13 @@ export default function WorkflowForm(props: { resources: ResourcesData, editingW
     const getUpdatedData = (data: WorkflowInfo) => { // get user custom resource data
         const updatedData = data;
 
-        if(customData.customFilmName !== "" && workflowInfo.film == "Other") {
+        if(customData.customFilmName !== "" && workflowInfo.film === "Other") {
             updatedData.film = customData.customFilmName;
         }
-        if(customData.customDeveloperName !== "" && workflowInfo.developer == "Other") {
+        if(customData.customDeveloperName !== "" && workflowInfo.developer === "Other") {
             updatedData.developer = customData.customDeveloperName;
         }
-        if(customData.customIso !== "0" && workflowInfo.iso == "Other") {
+        if(customData.customIso !== "0" && workflowInfo.iso === "Other") {
             updatedData.iso = customData.customIso;
         }
 
@@ -140,13 +141,6 @@ export default function WorkflowForm(props: { resources: ResourcesData, editingW
         }
     }
 
-    // show input field when needed to add a custom resource
-    const renderCustomInput = (field: string, value: string, type: string, onChange: (e: React.ChangeEvent<HTMLInputElement>) => void) => {
-        return field === "Other" ? (
-          <input maxLength={50} className="m-3 border rounded-sm border-zinc-400 text-zinc-800 dark:text-zinc-800" type={type} value={value} onChange={onChange} />
-        ) : null;
-    }
-
     // handles step info dialog open
     const handleDialog = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>): void => {
         event.preventDefault();
@@ -186,106 +180,38 @@ export default function WorkflowForm(props: { resources: ResourcesData, editingW
                         />
                 </div>
                 <div className="flex lg:w-1/2 w-full md:flex-row flex-col px-3">
-                    <div className="lg:m-3 lg:w-1/3 mx-3 my-1 flex flex-col">
-                        <label htmlFor="filmName">Film: </label>
-                        <select
-                            className="text-zinc-800 dark:text-zinc-800"
-                            id="filmName"
-                            value={workflowInfo.film}
-                            onChange={(e) => changeWorkflowProperty('film', e.target.value)}
-                            >
-                                <option
-                                    value="">
-                                </option>
-                            {
-                                props.resources.films.map((film) => (
-                                    <option
-                                        key={film}
-                                        value={film}>
-                                            {film}
-                                    </option>
-                                ))
-                            }
-                            <option
-                                value="Other">
-                                    Other
-                            </option>
-                        </select>
-                        {renderCustomInput(workflowInfo.film, customData.customFilmName, "text", (e) => setCustomData(prevData => ( {...prevData, customFilmName: e.target.value })))}
-                    </div>
-                    <div className="lg:m-3 lg:w-1/3 mx-3 my-1 flex flex-col">
-                        <label htmlFor="filmFormat">Film format: </label>
-                        <select
-                            className="text-zinc-800 dark:text-zinc-800"
-                            id="filmFormat"
-                            value={workflowInfo.filmFormat}
-                            onChange={(e) => changeWorkflowProperty('filmFormat', e.target.value as FilmFormat)}
-                            >
-                            {
-                                Object.values(FilmFormat).map((format) => (
-                                    <option key={format} value={format}>
-                                        {format}
-                                    </option>
-                                ))
-                            }
-                        </select>
-                    </div>
-                    <div className="lg:m-3 lg:w-1/3 mx-3 my-1 flex flex-col">
-                        <label htmlFor="filmIso">ISO: </label>
-                        <select
-                            className="text-zinc-800 dark:text-zinc-800"
-                            id="filmIso"
-                            value={workflowInfo.iso}
-                            onChange={(e) => changeWorkflowProperty('iso', e.target.value)}
-                            >
-                                <option
-                                    value="">
-                                </option>
-                            {
-                                props.resources.isos.map((iso) => (
-                                    <option
-                                        key={iso}
-                                        value={iso}>
-                                            {iso}
-                                    </option>
-                                ))
-                            }
-                            <option
-                                value="Other">
-                                    Other
-                            </option>
-                        </select>
-                        {renderCustomInput(workflowInfo.iso, customData.customIso, "number", (e) => setCustomData(prevData => ( {...prevData, customIso: e.target.value })))}
-                    </div>
+                    <CustomSelect
+                        title={"Film"}
+                        options={props.resources.films}
+                        currentValue={workflowInfo.film}
+                        onChange={val => changeWorkflowProperty('film', val.target.value)}
+                        customValue={customData.customFilmName}
+                        onCustomChange={val => setCustomData(prevData => ( {...prevData, customFilmName: val.target.value }))}
+                        />
+                    <CustomSelect
+                        title={"Film format"}
+                        options={Object.values(FilmFormat)}
+                        currentValue={workflowInfo.filmFormat}
+                        onChange={val => changeWorkflowProperty('filmFormat', val.target.value as FilmFormat)}
+                        />
+                    <CustomSelect
+                        title={"ISO"}
+                        options={props.resources.isos}
+                        currentValue={workflowInfo.iso}
+                        onChange={val => changeWorkflowProperty('iso', val.target.value)}
+                        customValue={customData.customIso}
+                        onCustomChange={val => setCustomData(prevData => ( {...prevData, customIso: val.target.value }))}
+                        />
                 </div>
                 <div className="flex lg:w-1/2 w-full md:flex-row flex-col px-3">
-                    <div className="lg:m-3 lg:w-1/3 mx-3 my-1 flex flex-col">
-                        <label htmlFor="developer">Developer: </label>
-                        <select
-                            className="text-zinc-800 dark:text-zinc-800"
-                            id="developer"
-                            value={workflowInfo.developer}
-                            onChange={(e) => changeWorkflowProperty('developer', e.target.value)}
-                            >
-                                <option
-                                    value="">
-                                </option>
-                            {
-                                props.resources.developers.map((developer) => (
-                                    <option
-                                        key={developer}
-                                        value={developer}>
-                                            {developer}
-                                    </option>
-                                ))
-                            }
-                            <option
-                                value="Other">
-                                    Other
-                            </option>
-                        </select>
-                        {renderCustomInput(workflowInfo.developer, customData.customDeveloperName, "text", (e) => setCustomData(prevData => ( {...prevData, customDeveloperName: e.target.value })))}
-                    </div>
+                    <CustomSelect
+                        title={"Developer"}
+                        options={props.resources.developers}
+                        currentValue={workflowInfo.developer}
+                        onChange={val => changeWorkflowProperty('developer', val.target.value)}
+                        customValue={customData.customDeveloperName}
+                        onCustomChange={val => setCustomData(prevData => ( {...prevData, customDeveloperName: val.target.value }))}
+                        />
                     <Dilution
                         handleDilutionChange={useCallback((dilution: string) => {
                             setWorkflowInfo(prevWorkflow => ({ ...prevWorkflow, dilution }));
