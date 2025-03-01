@@ -3,7 +3,7 @@
 import FilmFormat from "@/types/FilmFormat";
 import { ResourcesData } from "@/types/ResourcesData";
 import { WorkflowInfo } from "@/types/WorkflowInfo";
-import { ChangeEvent, useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Dilution from "./Dilution";
 import StepInfoForm from "./StepInfoForm";
 import StepInfo from "@/types/StepInfo";
